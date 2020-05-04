@@ -151,7 +151,7 @@ function start(){
     difficult = 0;
     playerPoints = 0;
 
-    activeGun = gunTypes[4];
+    activeGun = gunTypes[0];
     reloading = false;
     for(let bSlot of bonusSlots) bSlot.ocuped = false;
     for(let bonus of bonusActive) { bonus.remove(); }
@@ -185,6 +185,7 @@ function start(){
 /**
  * * COLLISIONS
  * **/
+
 
 var walls = document.getElementsByClassName("wall");
 

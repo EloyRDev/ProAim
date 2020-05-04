@@ -242,7 +242,7 @@ button:hover{
 .bonus-slot{
     display: flex;
     position: absolute;
-    
+
     height: 50px;
     width: 50px;
     border-radius: 50px;
@@ -299,7 +299,6 @@ button:hover{
     
     background-image: linear-gradient(#555, #222);
     filter: brightness(100%) contrast(100%);
-    box-shadow: none;
 
     transform-origin: top;
     z-index: 8;
