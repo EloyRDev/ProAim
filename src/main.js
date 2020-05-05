@@ -595,7 +595,7 @@ function enemyRespawnF(){
 
                 aliveCounter++;
 
-                respawnTime > 200 ? respawnTime -= 250 : 0;
+                respawnTime > 150 ? respawnTime -= 250 : 0;
             }
         }, respawnTime)
     }, 2000)
@@ -648,7 +648,7 @@ function enemyDamage(enem, dead){
         setTimeout(function(){
             let intern = setInterval(function(){
                 enem.style.opacity -= 0.01;
-                if(enem.style.opacit <= 0) { enem.remove(); clearInterval(intern); }
+                if(enem.style.opacity <= 0) { enem.remove(); clearInterval(intern); }
             }, 20)
         }, 10000)
     } else {
