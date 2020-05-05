@@ -115,7 +115,7 @@ function bonusSpawnF() {
 
         let whichBonus = Math.floor(Math.random() * 10);
         
-        if(whichBonus < 5) {
+        if(whichBonus < 4) {
             bonusElement.type = "life";
             bonusElement.value = 0;
         } else if(whichBonus < 8){
