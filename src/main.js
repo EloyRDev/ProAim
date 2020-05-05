@@ -121,7 +121,7 @@ function bonusSpawnF() {
             bonusElement.value = 0;
         } else if(whichBonus < 8){
             bonusElement.type = "gun";
-            if(difficult > 1) bonusElement.value = difficult - Math.floor(Math.random * 3);
+            if(difficult > 1) bonusElement.value = difficult - Math.floor(Math.random() * 3);
             else bonusElement.value = difficult;
         } else {
             bonusElement.type = "speed";
@@ -199,8 +199,8 @@ var tempCollisionMap = new Array(rangeHeight);
 for(let y = 0; y < rangeHeight; y++) {
     tempCollisionMap[y] = new Array(rangeWidth);
     for(let x = 0; x < rangeWidth; x++){
-        y < 2 || y > rangeHeight - 2 ? tempCollisionMap[y][x] = 1 : "";
-        x < 2 || x > rangeWidth - 2 ? tempCollisionMap[y][x] = 1 : "";
+        y < 2 || y > rangeHeight - 3 ? tempCollisionMap[y][x] = 1 : "";
+        x < 2 || x > rangeWidth - 3 ? tempCollisionMap[y][x] = 1 : "";
         for(let wall of walls){
             x*ms >= wall.offsetLeft && x*ms <= wall.offsetLeft + wall.offsetWidth && y*ms >= wall.offsetTop && y*ms <= wall.offsetTop + wall.offsetHeight ? tempCollisionMap[y][x] = 1 : "";
         }
@@ -405,7 +405,7 @@ function bulletEnd(b, bR, reason){
             b.style.opacity -= 0.01;
             if (b.style.opacity <= 0) { b.remove(); clearInterval(intern2); }
         }, 20)
-    }, 60000);
+    }, 20000);
 }
 
 /**
