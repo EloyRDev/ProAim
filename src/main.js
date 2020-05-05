@@ -41,7 +41,7 @@ var gunTypes = [
     {//Gun
         id : "Pistol",
         damage : 1,
-        dps : 600,
+        dps : 500,
         reload : 12,
         ammo : 12,
         distance : 300,
@@ -49,8 +49,8 @@ var gunTypes = [
     },
     {//MP5
         id : "Sub-rifle",
-        damage : 1,
-        dps : 200,
+        damage : 2,
+        dps : 100,
         reload : 24,
         ammo : 24,
         distance : 400,
@@ -59,7 +59,7 @@ var gunTypes = [
     {//Rifle
         id : "Rifle",
         damage : 4,
-        dps : 250,
+        dps : 150,
         reload : 30,
         ammo : 30,
         distance : 800,
@@ -152,12 +152,14 @@ function start(){
     playerPoints = 0;
 
     activeGun = gunTypes[0];
+    activeGun.ammo = activeGun.reload;
     reloading = false;
     for(let bSlot of bonusSlots) bSlot.ocuped = false;
     for(let bonus of bonusActive) { bonus.remove(); }
     bonusActive = [];
 
     respawnTime = 2000;
+    aliveCounter = 0;
     regularEnemy = enemyTypes[difficult];
     topEnemy = enemyTypes[difficult+1];
     bossEnemy = enemyTypes[difficult+2];
@@ -255,7 +257,7 @@ function playerCollision(top, left){
             if(bonus.type == "gun") activeGun = gunTypes[bonus.value];
             else if(bonus.type == "life") playerLife = 1000;
             else if(bonus.type == "speed") speed = bonus.value;
-            
+
             bonusActive.splice(bonusActive.indexOf(bonus), 1)
             bonusSlots[bonus.parent].ocuped = false;
             bonus.remove();
@@ -283,12 +285,31 @@ function shoot(e){
 function shootPriv(){
     if(reloading) return;
 
-    activeGun.ammo--;
+    if(activeGun.ammo > 0){
+        let shoot = document.createElement("audio");
+        shoot.src = "audio/"+activeGun.id+".mp3";
+        document.body.appendChild(shoot);
+        shoot.volume = 0.2;
+        
+        shoot.play();
+        setTimeout(function(){
+            shoot.remove();
+        }, 1000)
+
+        activeGun.ammo--;
+    }
+
     if(activeGun.ammo <= 0){
         reloading = true;
+        gameWindow.style.cursor = "wait";
+        let reload = document.createElement("audio");
+        reload.src = "audio/reload.mp3";
+        reload.play();
         setTimeout(function(){
             activeGun.ammo = activeGun.reload;
             reloading = false;
+            gameWindow.style.cursor = "crosshair";
+            reload.remove();
         }, activeGun.reloadTime)
     }
 
@@ -454,6 +475,7 @@ function playerDead(){
     clearInterval(update);
     clearInterval(spawnEnemy);
 
+    regKeys = [false, false, false, false];
     gameWindow.style.opacity = 1;
     gameOver.style.opacity = 1;
 
@@ -527,48 +549,54 @@ var enemyTypes = [
         damage : 100,
         life : 100,
         points: 5000,
-        speed : 6,
+        speed : 8,
         gradient : "linear-gradient(135deg, rgb(27, 27, 27), rgb(10, 10, 10))"
     }
 ]
-var regularEnemy, topEnemy, bossEnemy;
 
+var regularEnemy, topEnemy, bossEnemy;
 var enemies = [];
+let aliveCounter = 0;
+
 
 function enemyRespawnF(){
     setTimeout(function(){
         let idCounter = 1;
         spawnEnemy = setInterval(function(){
-            if(idCounter % 50 == 0 && difficult < 4) {
-                difficult++;
-                regularEnemy = enemyTypes[difficult];
-                topEnemy = enemyTypes[difficult+1];
-                bossEnemy = enemyTypes[difficult+2];
+            if(aliveCounter < 100) {//Trying to improve performance
+                if(idCounter % 50 == 0 && difficult < 4) {
+                    difficult++;
+                    regularEnemy = enemyTypes[difficult];
+                    topEnemy = enemyTypes[difficult+1];
+                    bossEnemy = enemyTypes[difficult+2];
+                }
+
+                let chosenEnemy = regularEnemy;
+                if(idCounter % 5 == 0) chosenEnemy = topEnemy;
+                if(idCounter % 20 == 0) chosenEnemy = bossEnemy;
+
+                let enemy = document.createElement("div");
+                enemy.classList.add("enemy");
+                enemy.style.left = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetWidth + "px";
+                enemy.style.top = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetHeight + "px";
+                enemy.style.backgroundImage = chosenEnemy.gradient;
+
+                enemy.damage = chosenEnemy.damage;
+                enemy.life = chosenEnemy.life;
+                enemy.points = chosenEnemy.points;
+                enemy.speed = chosenEnemy.speed;
+                enemy.hitCounter = false;
+                
+                map.appendChild(enemy);
+                enemies.push(enemy);
+
+                idCounter++;
+                enemyAI(enemy);
+
+                aliveCounter++;
+
+                respawnTime > 200 ? respawnTime -= 250 : 0;
             }
-
-            let chosenEnemy = regularEnemy;
-            if(idCounter % 5 == 0) chosenEnemy = topEnemy;
-            if(idCounter % 20 == 0) chosenEnemy = bossEnemy;
-
-            let enemy = document.createElement("div");
-            enemy.classList.add("enemy");
-            enemy.style.left = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetWidth + "px";
-            enemy.style.top = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetHeight + "px";
-            enemy.style.backgroundImage = chosenEnemy.gradient;
-
-            enemy.damage = chosenEnemy.damage;
-            enemy.life = chosenEnemy.life;
-            enemy.points = chosenEnemy.points;
-            enemy.speed = chosenEnemy.speed;
-            enemy.hitCounter = false;
-            
-            map.appendChild(enemy);
-
-            enemies = document.querySelectorAll(".enemy");
-            idCounter++;
-            enemyAI(enemy);
-
-            respawnTime > 75 ? respawnTime -= 250 : 0;
         }, respawnTime)
     }, 2000)
 }
@@ -585,7 +613,7 @@ function enemyAI(enem) {
         if (enem.classList.contains("enemy-dead")) clearInterval(AIProcess);
         enem.style.boxShadow = "white 0 0 5px";
 
-        if(Math.hypot(Math.abs((enem.offsetTop+25) - playerY), Math.abs((enem.offsetLeft+20) - playerX)) > 5) {
+        if(Math.hypot(Math.abs((enem.offsetTop+25) - playerY), Math.abs((enem.offsetLeft+20) - playerX)) > 5) {    
             if (Math.abs((enem.offsetLeft + 20) - playerX) > 5)
                 enem.offsetLeft + 20 < playerX ? enem.style.left = (enem.offsetLeft + speed) + "px" : enem.style.left = (enem.offsetLeft - speed) + "px";
             if (Math.abs((enem.offsetTop + 25) - playerY) > 5)
@@ -613,6 +641,9 @@ function enemyDamage(enem, dead){
         enem.style.filter = "grayscale(100%) invert(100%)";
         enem.style.zIndex = "7";
         enem.style.opacity = 1;
+
+        aliveCounter--;
+        enemies.splice(enemies.indexOf(enem), 1)
 
         setTimeout(function(){
             let intern = setInterval(function(){

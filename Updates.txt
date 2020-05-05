@@ -1,0 +1,4 @@
+REMEMBER checking https://github.com/EloyRDev/ProAim for updates.
+
+0.1 - Game released. Terrible performance on low-spec computers. Incompatibility with Internet Explorer. Minor visual glitches on Firefox.
+0.2 - Some minor bugs fixed. Working on performance yet, but it's close to be solved.
