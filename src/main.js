@@ -143,7 +143,7 @@ function bonusSpawnF() {
             bonusActive.push(bonusElement);
             break;
         }
-    }, 60000)
+    }, 40000)
 }
 
 function start(){
