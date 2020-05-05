@@ -13,8 +13,7 @@
  * **/
 
 var player = document.getElementById("player");
-var playerLife, playerPoints, difficult;
-var speed = 5;
+var playerLife, playerPoints, difficult, speed;
 
 var ms = 3;
 var gameWindow = document.getElementById("game-window");
@@ -150,6 +149,7 @@ function start(){
     playerLife = 1000;
     difficult = 0;
     playerPoints = 0;
+    speed = 5;
 
     activeGun = gunTypes[0];
     activeGun.ammo = activeGun.reload;
@@ -551,7 +551,7 @@ var enemyTypes = [
         damage : 100,
         life : 100,
         points: 5000,
-        speed : 8,
+        speed : 6,
         gradient : "linear-gradient(135deg, rgb(27, 27, 27), rgb(10, 10, 10))"
     }
 ]
