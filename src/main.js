@@ -311,6 +311,8 @@ function shootPriv(){
             gameWindow.style.cursor = "crosshair";
             reload.remove();
         }, activeGun.reloadTime)
+
+        return;
     }
 
     rayTracing = Math.floor(Math.hypot(mouseY - playerY, mouseX - playerX));
