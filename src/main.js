@@ -648,7 +648,7 @@ function enemyDamage(enem, dead){
         setTimeout(function(){
             let intern = setInterval(function(){
                 enem.style.opacity -= 0.01;
-                enem.style.opacity <= 0 ? clearInterval(intern) : 0;
+                if(enem.style.opacit <= 0) { enem.remove(); clearInterval(intern); }
             }, 20)
         }, 10000)
     } else {
