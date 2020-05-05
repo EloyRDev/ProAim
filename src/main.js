@@ -447,26 +447,10 @@ function playerMov(){
         playerMoving = true;
 
         var intern = setInterval(function(){
-            if (regKeys[0] && regKeys[1] && !playerCollision(player.offsetTop - speed, player.offsetLeft - speed)) { 
-                player.style.top = (player.offsetTop - speed) + "px"; 
-                player.style.left = (player.offsetLeft - speed) + "px";
-
-            } else if (regKeys[0] && regKeys[3] && !playerCollision(player.offsetTop - speed, player.offsetLeft + speed)) { 
-                player.style.top = (player.offsetTop - speed) + "px"; 
-                player.style.left = (player.offsetLeft + speed) + "px";
-
-            } else if (regKeys[2] && regKeys[1] && !playerCollision(player.offsetTop + speed, player.offsetLeft - speed)) { 
-                player.style.top = (player.offsetTop + speed) + "px"; 
-                player.style.left = (player.offsetLeft - speed) + "px";
-            
-            } else if (regKeys[2] && regKeys[3] && !playerCollision(player.offsetTop + speed, player.offsetLeft + speed)) { 
-                player.style.top = (player.offsetTop + speed) + "px"; 
-                player.style.left = (player.offsetLeft + speed) + "px";
-            
-            } else if (regKeys[0] && !playerCollision(player.offsetTop - speed, 0)) player.style.top = (player.offsetTop - speed) + "px";
-            else if (regKeys[1] && !playerCollision(0, player.offsetLeft - speed)) player.style.left = (player.offsetLeft - speed) + "px";
-            else if (regKeys[2] && !playerCollision(player.offsetTop + speed, 0)) player.style.top = (player.offsetTop + speed) + "px";
-            else if (regKeys[3] && !playerCollision(0, player.offsetLeft + speed)) player.style.left = (player.offsetLeft + speed) + "px";
+            if (regKeys[0] && !playerCollision(player.offsetTop - speed, 0)) player.style.top = (player.offsetTop - speed) + "px";
+            if (regKeys[1] && !playerCollision(0, player.offsetLeft - speed)) player.style.left = (player.offsetLeft - speed) + "px";
+            if (regKeys[2] && !playerCollision(player.offsetTop + speed, 0)) player.style.top = (player.offsetTop + speed) + "px";
+            if (regKeys[3] && !playerCollision(0, player.offsetLeft + speed)) player.style.left = (player.offsetLeft + speed) + "px";
 
             if(!regKeys.includes(true)) { playerMoving = false; clearInterval(intern); }
         }, 20)
