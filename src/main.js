@@ -1,3 +1,5 @@
+const version = 0;
+
 /** 
  *! DISCLAIMER
 
@@ -13,13 +15,15 @@
  * **/
 
 var player = document.getElementById("player");
-var playerLife, playerPoints, difficult, speed;
+var playerRef = document.getElementById("player-ref");
+var playerLife, playerPoints, difficult, speed, firstMove;
 
 var ms = 3;
 var gameWindow = document.getElementById("game-window");
 var gameOver = document.getElementById("gameover");
 var gameStart = document.getElementById("gamestart");
 var map = document.getElementById("map");
+var mapOver = document.getElementById("map-over");
 var windowOver = document.getElementById("over");
 var bonusSlots = document.querySelectorAll(".bonus-slot");
 
@@ -85,26 +89,31 @@ var gunTypes = [
 ]
 var activeGun,reloading;
 
-windowOver.addEventListener("mousedown", shoot);
+mapOver.addEventListener("mousedown", shoot);
 document.addEventListener("mouseup", function() { clearInterval(repeatMouse)});
 
-windowOver.addEventListener("mousemove", function(e) {
-    if(e.target.id == ("over")){
+mapOver.addEventListener("mousemove", function(e) {
+    if(e.target.id == "map-over"){
         mouseX = e.offsetX - 5;
         mouseY = e.offsetY - 5; 
-    } 
+    }
 });
 
 function updateF(){
     update = setInterval(function(){
         playerY = player.offsetTop + player.offsetHeight/2;
         playerX = player.offsetLeft + player.offsetWidth/2;
-        player.style.transform = "rotate(" + Math.atan2(mouseX - playerX, - (mouseY - playerY)) * (180/Math.PI) + "deg)";
+        player.style.transform = "rotate(" + Math.atan2(mouseX - playerX, - (mouseY - playerY)) * (180/Math.PI) + "deg)"
 
         uiAmmo.innerHTML = activeGun.ammo > 0 ? activeGun.ammo : "↻";
         uiGun.innerHTML = activeGun.id;
         uiHealth.innerHTML = playerLife;
         uiPoints.innerHTML = Math.floor(playerPoints);
+
+        if(!firstMove) {
+            map.style.top = (((map.offsetHeight - gameWindow.offsetHeight)/2)*-1) + "px";
+            map.style.left = (((map.offsetWidth - gameWindow.offsetWidth)/2)*-1) + "px";
+        }
     }, 25)
 }
 
@@ -150,6 +159,7 @@ function start(){
     difficult = 0;
     playerPoints = 0;
     speed = 5;
+    firstMove = false;
 
     activeGun = gunTypes[0];
     activeGun.ammo = activeGun.reload;
@@ -171,13 +181,17 @@ function start(){
     for(let b of trashMis) b.remove();
     for(let e of enemies) e.remove();
 
-    player.style.top = "50px";
-    player.style.left = "100px";
-
     gameWindow.style.display = "block";
     gameWindow.style.opacity = 1;
     gameOver.style.display = "none";
     gameStart.style.display = "none";
+    map.style.top = (((map.offsetHeight - gameWindow.offsetHeight)/2)*-1) + "px";
+    map.style.left = (((map.offsetWidth - gameWindow.offsetWidth)/2)*-1) + "px";
+
+    player.style.top = "975px";
+    player.style.left = "975px";
+    playerRef.style.top = (gameWindow.offsetHeight/2) + "px";
+    playerRef.style.left = (gameWindow.offsetWidth/2) + "px";
 
     enemyRespawnF();
     bonusSpawnF();
@@ -194,21 +208,27 @@ var walls = document.getElementsByClassName("wall");
 var rangeWidth = Math.floor(map.offsetWidth/ms);
 var rangeHeight = Math.floor(map.offsetHeight/ms);
 
-var tempCollisionMap = new Array(rangeHeight);
+if(localStorage.getItem("hasMap-" + version) != "true") {
+    localStorage.clear();
+    localStorage.setItem("hasMap-" + version, "true");
 
-for(let y = 0; y < rangeHeight; y++) {
-    tempCollisionMap[y] = new Array(rangeWidth);
-    for(let x = 0; x < rangeWidth; x++){
-        y < 2 || y > rangeHeight - 3 ? tempCollisionMap[y][x] = 1 : "";
-        x < 2 || x > rangeWidth - 3 ? tempCollisionMap[y][x] = 1 : "";
-        for(let wall of walls){
-            x*ms >= wall.offsetLeft && x*ms <= wall.offsetLeft + wall.offsetWidth && y*ms >= wall.offsetTop && y*ms <= wall.offsetTop + wall.offsetHeight ? tempCollisionMap[y][x] = 1 : "";
+    var tempCollisionMap = new Array(rangeHeight);
+
+    for(let y = 0; y < rangeHeight; y++) {
+        tempCollisionMap[y] = new Array(rangeWidth);
+        for(let x = 0; x < rangeWidth; x++){
+            y < 2 || y > rangeHeight - 3 ? tempCollisionMap[y][x] = 1 : "";
+            x < 2 || x > rangeWidth - 3 ? tempCollisionMap[y][x] = 1 : "";
+            for(let wall of walls){
+                x*ms >= wall.offsetLeft && x*ms <= wall.offsetLeft + wall.offsetWidth && y*ms >= wall.offsetTop && y*ms <= wall.offsetTop + wall.offsetHeight ? tempCollisionMap[y][x] = 1 : "";
+            }
+            tempCollisionMap[y][x] != 1 ? tempCollisionMap[y][x] = 0 : "";
         }
-        tempCollisionMap[y][x] != 1 ? tempCollisionMap[y][x] = 0 : "";
     }
-}
 
-const wallCollisionBox = tempCollisionMap;
+    localStorage.setItem("map-" + version, JSON.stringify(tempCollisionMap));
+}
+const wallCollisionBox = JSON.parse(localStorage.getItem("map-" + version));
 gameWindow.style.display = "none";
 
 var enemyCollisionBugHandler = [];
@@ -442,15 +462,32 @@ function keyReleased(e){
 }
 
 function playerMov(){
-
+    firstMove = true;
     if(!playerMoving && playerLife > 0) {
         playerMoving = true;
 
         var intern = setInterval(function(){
-            if (regKeys[0] && !playerCollision(player.offsetTop - speed, 0)) player.style.top = (player.offsetTop - speed) + "px";
-            if (regKeys[1] && !playerCollision(0, player.offsetLeft - speed)) player.style.left = (player.offsetLeft - speed) + "px";
-            if (regKeys[2] && !playerCollision(player.offsetTop + speed, 0)) player.style.top = (player.offsetTop + speed) + "px";
-            if (regKeys[3] && !playerCollision(0, player.offsetLeft + speed)) player.style.left = (player.offsetLeft + speed) + "px";
+
+            if (regKeys[0] && !playerCollision(player.offsetTop - speed, 0)) { 
+                player.style.top = (player.offsetTop - speed) + "px";
+                if((playerRef.offsetTop + 25) <= gameWindow.offsetHeight/2.3 && map.offsetTop < 0) map.style.top = (map.offsetTop + speed) + "px";
+                else playerRef.style.top = (playerRef.offsetTop - speed) + "px";
+            }
+            if (regKeys[1] && !playerCollision(0, player.offsetLeft - speed)) {
+                 player.style.left = (player.offsetLeft - speed) + "px";
+                 if((playerRef.offsetLeft + 25) <= gameWindow.offsetWidth/2.3 && map.offsetLeft < 0) map.style.left = (map.offsetLeft + speed) + "px";
+                else playerRef.style.left = (playerRef.offsetLeft - speed) + "px";
+            }
+            if (regKeys[2] && !playerCollision(player.offsetTop + speed, 0)) {
+                player.style.top = (player.offsetTop + speed) + "px";
+                if((playerRef.offsetTop + 25) >= gameWindow.offsetHeight - gameWindow.offsetHeight/2.3 && map.offsetTop < map.offsetHeight - gameWindow.offsetHeight) map.style.top = (map.offsetTop - speed) + "px";
+                else playerRef.style.top = (playerRef.offsetTop + speed) + "px";
+            }
+            if (regKeys[3] && !playerCollision(0, player.offsetLeft + speed)) {
+                player.style.left = (player.offsetLeft + speed) + "px";
+                if((playerRef.offsetLeft + 25) >= gameWindow.offsetWidth - gameWindow.offsetWidth/2.3 && map.offsetLeft < map.offsetWidth - gameWindow.offsetWidth) map.style.left = (map.offsetLeft - speed) + "px";
+                else playerRef.style.left = (playerRef.offsetLeft + speed) + "px";
+            }
 
             if(!regKeys.includes(true)) { playerMoving = false; clearInterval(intern); }
         }, 20)
@@ -563,8 +600,8 @@ function enemyRespawnF(){
 
                 let enemy = document.createElement("div");
                 enemy.classList.add("enemy");
-                enemy.style.left = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetWidth + "px";
-                enemy.style.top = Math.floor(Math.random() * 2) == 0 ? "0px" : gameWindow.offsetHeight + "px";
+                enemy.style.left = Math.floor(Math.random() * 2) == 0 ? "0px" : map.offsetWidth + "px";
+                enemy.style.top = Math.floor(Math.random() * 2) == 0 ? "0px" : map.offsetHeight + "px";
                 enemy.style.backgroundImage = chosenEnemy.gradient;
 
                 enemy.damage = chosenEnemy.damage;
@@ -584,7 +621,7 @@ function enemyRespawnF(){
                 respawnTime > 150 ? respawnTime -= 250 : 0;
             }
         }, respawnTime)
-    }, 2000)
+    }, 100000000)
 }
 
 
