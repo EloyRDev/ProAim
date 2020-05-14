@@ -1,4 +1,4 @@
-const version = 0;
+const version = 1;
 
 /** 
  *! DISCLAIMER
@@ -474,18 +474,18 @@ function playerMov(){
                 else playerRef.style.top = (playerRef.offsetTop - speed) + "px";
             }
             if (regKeys[1] && !playerCollision(0, player.offsetLeft - speed)) {
-                 player.style.left = (player.offsetLeft - speed) + "px";
-                 if((playerRef.offsetLeft + 25) <= gameWindow.offsetWidth/2.3 && map.offsetLeft < 0) map.style.left = (map.offsetLeft + speed) + "px";
+                player.style.left = (player.offsetLeft - speed) + "px";
+                if((playerRef.offsetLeft + 25) <= gameWindow.offsetWidth/2.3 && map.offsetLeft < 0) map.style.left = (map.offsetLeft + speed) + "px";
                 else playerRef.style.left = (playerRef.offsetLeft - speed) + "px";
             }
             if (regKeys[2] && !playerCollision(player.offsetTop + speed, 0)) {
                 player.style.top = (player.offsetTop + speed) + "px";
-                if((playerRef.offsetTop + 25) >= gameWindow.offsetHeight - gameWindow.offsetHeight/2.3 && map.offsetTop < map.offsetHeight - gameWindow.offsetHeight) map.style.top = (map.offsetTop - speed) + "px";
+                if((playerRef.offsetTop + 25) >= (gameWindow.offsetHeight+5) - gameWindow.offsetHeight/2.3 && Math.abs(map.offsetTop - gameWindow.offsetHeight) < map.offsetHeight + 5) map.style.top = (map.offsetTop - speed) + "px";
                 else playerRef.style.top = (playerRef.offsetTop + speed) + "px";
             }
             if (regKeys[3] && !playerCollision(0, player.offsetLeft + speed)) {
                 player.style.left = (player.offsetLeft + speed) + "px";
-                if((playerRef.offsetLeft + 25) >= gameWindow.offsetWidth - gameWindow.offsetWidth/2.3 && map.offsetLeft < map.offsetWidth - gameWindow.offsetWidth) map.style.left = (map.offsetLeft - speed) + "px";
+                if((playerRef.offsetLeft + 25) >= (gameWindow.offsetWidth+5) - gameWindow.offsetWidth/2.3 && Math.abs(map.offsetLeft - gameWindow.offsetWidth) < map.offsetWidth + 5) map.style.left = (map.offsetLeft - speed) + "px";
                 else playerRef.style.left = (playerRef.offsetLeft + speed) + "px";
             }
 
@@ -621,7 +621,7 @@ function enemyRespawnF(){
                 respawnTime > 150 ? respawnTime -= 250 : 0;
             }
         }, respawnTime)
-    }, 100000000)
+    }, 10000)
 }
 
 

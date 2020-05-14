@@ -3,3 +3,6 @@ REMEMBER checking https://github.com/EloyRDev/ProAim for updates.
 0.1 - Game released. Terrible performance on low-spec computers. Incompatibility with Internet Explorer. Minor visual glitches on Firefox.
 0.2 - Some minor bugs fixed. Working on performance yet, but it's close to be solved.
 0.3 - Performance fixed. Not on its fullest, maybe on low-spec still runs slow, but now it runs much much better.
+0.4 - Big update. Added a camera mechanic and a new map, more big and dynamic. Needs load at first run, then it loads instantly (If played on the same browser).
+
+FUTURE 0.5 - More optimization of first load, or just better UI to let the player now why everything loads so slow at the start.
